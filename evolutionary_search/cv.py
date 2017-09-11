@@ -401,8 +401,6 @@ class EvolutionaryAlgorithmSearchCV(BaseSearchCV):
         toolbox.register("mutate", _mutIndividual, indpb=self.gene_mutation_prob, up=maxints)
         toolbox.register("select", tools.selTournament, tournsize=self.tournament_size)
 
-        pop = toolbox.population(n=self.population_size)
-        hof = tools.HallOfFame(1)
 
         # Stats
         stats = tools.Statistics(lambda ind: ind.fitness.values)
@@ -413,8 +411,11 @@ class EvolutionaryAlgorithmSearchCV(BaseSearchCV):
 
         # History
         hist = tools.History()
+        pop = toolbox.population(n=self.population_size)
+        hof = tools.HallOfFame(1)
         toolbox.decorate("mate", hist.decorator)
         toolbox.decorate("mutate", hist.decorator)
+        toolbox.decorate("population", hist.decorator)
         hist.update(pop)
 
         if self.verbose:
@@ -443,3 +444,6 @@ class EvolutionaryAlgorithmSearchCV(BaseSearchCV):
         if self.n_jobs > 1:
             pool.close()
             pool.join()
+
+        self.best_score_ = current_best_score_
+        self.best_params_ = current_best_params_
